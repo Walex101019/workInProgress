@@ -17,8 +17,7 @@
 #define MAX_ALIASES 50
 
 /* Structure to store aliases */
-struct Alias
-{
+struct Alias {
 	char name[MAX_ALIAS_NAME_LENGTH];
 	char value[MAX_ALIAS_VALUE_LENGTH];
 };

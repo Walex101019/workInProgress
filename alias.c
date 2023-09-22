@@ -1,5 +1,5 @@
 #include "shell.h"
-static struct Alias aliases[MAX_ALIASES];
+static struct Alias *aliases[MAX_ALIASES];
 static int alias_count;
 /**
  * find_alias - entry
@@ -12,7 +12,7 @@ int find_alias(const char *name)
 
 	for (i = 0; i < alias_count; i++)
 	{
-		if (_strcmp(aliases[i].name, name) == 0)
+		if (_strcmp(aliases[i]->name, name) == 0)
 		{
 			return (i);
 		}
@@ -29,7 +29,7 @@ void list_aliases(void)
 
 	for (i = 0; i < alias_count; i++)
 	{
-		printf("%s='%s'\n", aliases[i].name, aliases[i].value);
+		printf("%s='%s'\n", aliases[i]->name, aliases[i]->value);
 	}
 }
 /**
@@ -46,7 +46,7 @@ void print_aliases(char *names[])
 
 		if (index != -1)
 		{
-			printf("%s='%s'\n", aliases[index].name, aliases[index].value);
+			printf("%s='%s'\n", aliases[index]->name, aliases[index]->value);
 		}
 	}
 }
@@ -72,15 +72,16 @@ void define_aliases(char *aliases[])
 
 			if (index != -1)
 			{
-				free(aliases[index].value);
-				aliases[index].value = _strdup(value);
+				free(aliases[index]->value);
+				aliases[index]->value = _strdup(value);
 			}
 			else
 			{
 				if (alias_count < MAX_ALIASES)
 				{
-					_strncpy(aliases[alias_count].name, name, MAX_ALIAS_NAME_LENGTH -1);
-					_strncpy(aliases[alias_count].value, value MAX_ALIAS_VALUE_LENGTH -1);
+					aliases[alias_count] = malloc(sizeof(struct Alias));
+					_strncpy(aliases[alias_count]->name, name, MAX_ALIAS_NAME_LENGTH -1);
+					_strncpy(aliases[alias_count]->value, value, MAX_ALIAS_VALUE_LENGTH -1);
 					alias_count++;
 				}
 				else
