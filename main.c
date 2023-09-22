@@ -1,74 +1,79 @@
 #include "shell.h"
 /**
  * main - entry point
- * Return: 0
+ * @argc: arguement passed
+ * @argv: arguement passed
+ * Return: return
 */
-int main(void)
+int main(int argc, char *argv[])
 {
 	char *buffer = NULL;
 	size_t bufsize = 0;
 	ssize_t characters_read;
+	int status = EXIT_SUCCESS;
 
-	while (1)
+	if (argc > 1)
 	{
-		printf("WalexShell :) ");
-		characters_read = my_getline(&buffer, &bufsize, 0);
-
-		if (characters_read == -1)
+		status = execute_from_file(argv[1]);
+		if (status != EXIT_SUCCESS)
 		{
-			if (feof(stdin)) /* Handle Ctrl+D (end of file) */
-			{
-				printf("\n");
-				free(buffer);
-				exit(EXIT_SUCCESS);
-			}
-			perror("my_getline");
-			exit(EXIT_FAILURE);
+			fprintf(stderr, "Error executing commands from the file.\n");
+			return (EXIT_FAILURE);
 		}
-		/* Remove the newline character from the end of the input */
-		if (buffer[characters_read - 1] == '\n')
-		{
-			buffer[characters_read - 1] = '\0';
-		}
-		/* Preprocess the user input (replace variables and remove comments) */
-		replace_variables(buffer);
-		/* Handle built-in commands */
-		if (_strcmp(buffer, "env") == 0)
-		{
-			/* Handle the "env" command */
-			handle_env();
-		}
-		else if (_strstr(buffer, "setenv") == buffer)
-		{
-			/* Handle the "setenv" command */
-			handle_setenv(buffer);
-		}
-		else if (_strstr(buffer, "unsetenv") == buffer)
-		{
-			/* Handle the "unsetenv" command */
-			handle_unsetenv(buffer);
-		}
-		else if (_strstr(buffer, "cd") == buffer)
-		{
-			/* Handle the "cd" command */
-			handle_cd(buffer);
-		}
-		else if (_strstr(buffer, "alias") == buffer)
-		{
-			/* Handle the "alias" command */
-			handle_alias(buffer);
-		}
-		else if (_strstr(buffer, "&&") || strstr(buffer, "||"))
-		{
-			/* Handle commands with logical operators */
-			execute_logic_operator(buffer);
-		}
-		else
-		{
-			/* Execute the command in a child process */
-			execute_command(buffer);
-		}
-		free(buffer);
 	}
-	return (0);
+	else
+	{
+		while (1)
+		{
+			display_prompt();
+			characters_read = my_getline(&buffer, &bufsize, 0);
+
+			if (characters_read == -1)
+			{
+				if (feof(stdin))
+				{
+					printf("\n");
+					free(buffer);
+					exit(EXIT_SUCCESS);
+				}
+				perror("my_getline");
+				exit(EXIT_FAILURE);
+			}
+			if (buffer[characters_read - 1] == '\n')
+			{
+				buffer[characters_read - 1] = '\0';
+			}
+			replace_variables(buffer);
+			if (_strcmp(buffer, "env") == 0)
+			{
+				handle_env();
+			}
+			else if (_strstr(buffer, "setenv") == buffer)
+			{
+				handle_setenv(buffer);
+			}
+			else if (_strstr(buffer, "unsetenv") == buffer)
+			{
+				handle_unsetenv(buffer);
+			}
+			else if (_strstr(buffer, "cd") == buffer)
+			{
+				handle_cd(buffer);
+			}
+			else if (_strstr(buffer, "alias") == buffer)
+			{
+				handle_alias(buffer);
+			}
+			else if (_strstr(buffer, "&&") || strstr(buffer, "||"))
+			{
+				execute_logic_operator(buffer);
+			}
+			else
+			{
+				execute_command(buffer);
+			}
+			free(buffer);
+		}
+	}
+	return (status);
 }

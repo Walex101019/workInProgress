@@ -28,16 +28,26 @@ To compile and run Simple Shell, follow these steps:
    ./simple_shell
 
 
-Built-In Commands
+## Built-In Commands
 
 The following built-in commands are supported:
 
 cd [DIRECTORY]: 		Change the current directory.
+
 env: 				Display the current environment.
+
 exit [STATUS]: 			Exit the shell with an optional status code.
+
 setenv VARIABLE VALUE: 		Initialize or modify an environment variable.
+
 unsetenv VARIABLE: 		Remove an environment variable.
+
 alias [name[='value'] ...]: 	Define and manage aliases.
+
 alias name [name2 ...]: 	Display aliases.
+
 ?: 				Display the exit status of the last command.
+
 $$: 				Display the shell's process ID.
+
+ #:				comment

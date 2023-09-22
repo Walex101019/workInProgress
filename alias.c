@@ -79,8 +79,8 @@ void define_aliases(char *aliases[])
 			{
 				if (alias_count < MAX_ALIASES)
 				{
-					_strcpy(aliases[alias_count].name, name, MAX_ALIAS_NAME_LENGTH -1);
-					_strcpy(aliases[alias_count].value, value MAX_ALIAS_VALUE_LENGTH -1);
+					_strncpy(aliases[alias_count].name, name, MAX_ALIAS_NAME_LENGTH -1);
+					_strncpy(aliases[alias_count].value, value MAX_ALIAS_VALUE_LENGTH -1);
 					alias_count++;
 				}
 				else
