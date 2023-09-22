@@ -1,70 +1,74 @@
 #include "shell.h"
-
 /**
- * main - Entry point for the shell program
- * @ac: Argument count
- * @av: Argument vector
- *
- * Return: Always 0
- */
-int main(int ac, char **av)
+ * main - entry point
+ * Return: 0
+*/
+int main(void)
 {
-    char input[MAX_INPUT_LENGTH];
-    char *args[MAX_ARGS];
-    int background;
+	char *buffer = NULL;
+	size_t bufsize = 0;
+	ssize_t characters_read;
 
-    /* Register SIGINT handler */
-    signal(SIGINT, sigint_handler);
+	while (1)
+	{
+		printf("WalexShell :) ");
+		characters_read = my_getline(&buffer, &bufsize, 0);
 
-    while (1)
-    {
-        printf("ComplexShell> ");
-        fgets(input, MAX_INPUT_LENGTH, stdin);
-        input[strcspn(input, "\n")] = '\0';
-
-        if (strcmp(input, "exit") == 0)
-        {
-            printf("Goodbye!\n");
-            break;
-        }
-
-        parse_command(input, args, &background);
-
-        pid_t pid = fork();
-
-        if (pid == -1)
-        {
-            perror("Fork failed");
-            exit(1);
-        }
-
-        if (pid == 0)
-        {
-            if (background)
-            {
-                int dev_null = open("/dev/null", O_RDONLY);
-                dup2(dev_null, 0);
-                close(dev_null);
-            }
-
-            int result = execvp(args[0], args);
-
-            if (result == -1)
-            {
-                perror("Command execution failed");
-                exit(1);
-            }
-
-            exit(EXIT_CODE);
-        }
-        else
-        {
-            if (!background)
-            {
-                wait(NULL); /* Wait for the child process to complete */
-            }
-        }
-    }
-
-    return (0);
+		if (characters_read == -1)
+		{
+			if (feof(stdin)) /* Handle Ctrl+D (end of file) */
+			{
+				printf("\n");
+				free(buffer);
+				exit(EXIT_SUCCESS);
+			}
+			perror("my_getline");
+			exit(EXIT_FAILURE);
+		}
+		/* Remove the newline character from the end of the input */
+		if (buffer[characters_read - 1] == '\n')
+		{
+			buffer[characters_read - 1] = '\0';
+		}
+		/* Preprocess the user input (replace variables and remove comments) */
+		replace_variables(buffer);
+		/* Handle built-in commands */
+		if (_strcmp(buffer, "env") == 0)
+		{
+			/* Handle the "env" command */
+			handle_env();
+		}
+		else if (_strstr(buffer, "setenv") == buffer)
+		{
+			/* Handle the "setenv" command */
+			handle_setenv(buffer);
+		}
+		else if (_strstr(buffer, "unsetenv") == buffer)
+		{
+			/* Handle the "unsetenv" command */
+			handle_unsetenv(buffer);
+		}
+		else if (_strstr(buffer, "cd") == buffer)
+		{
+			/* Handle the "cd" command */
+			handle_cd(buffer);
+		}
+		else if (_strstr(buffer, "alias") == buffer)
+		{
+			/* Handle the "alias" command */
+			handle_alias(buffer);
+		}
+		else if (_strstr(buffer, "&&") || strstr(buffer, "||"))
+		{
+			/* Handle commands with logical operators */
+			execute_logic_operator(buffer);
+		}
+		else
+		{
+			/* Execute the command in a child process */
+			execute_command(buffer);
+		}
+		free(buffer);
+	}
+	return (0);
 }
