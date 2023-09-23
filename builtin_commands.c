@@ -79,7 +79,7 @@ void handle_alias(char *buffer)
 		if (strchr(args[0], '=') != NULL)
 		{
 			/* Define new aliases */
-			define_aliases(args);
+			define_aliases(const char *name, const char *value);
 		}
 		else
 		{

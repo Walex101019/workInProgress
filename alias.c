@@ -1,23 +1,42 @@
 #include "shell.h"
-static struct Alias *aliases[MAX_ALIASES];
-static int alias_count;
 /**
  * find_alias - entry
- * @name: args
+ * @argc: arg
+ * @argv: args
  * Return: returns -1
 */
-int find_alias(const char *name)
+int find_alias(int argc, char*argv[])
 {
-	int i;
-
-	for (i = 0; i < alias_count; i++)
+	if (argc == 1)
 	{
-		if (_strcmp(aliases[i]->name, name) == 0)
+		print_aliases();
+	}
+	else
+	{
+		int 1;
+		for (i = 1, i < argc; i++)
 		{
-			return (i);
+			if (_strchr(argv[i], '='))
+			{
+				char *name = strtok(argv[i], "=");
+				char *value = strtok(NULL, "=");
+
+				if (name && value)
+				{
+					define_alias(name, value);
+				}
+				else
+				{
+					fprintf(stderr, "Invalid alias syntax: %s\n", argv[i])
+				}
+			}
+			else
+			{
+				print_alias(argv[i]);
+			}
+
 		}
 	}
-	return (-1);
 }
 /**
  * list_aliases - entry point
@@ -29,7 +48,7 @@ void list_aliases(void)
 
 	for (i = 0; i < alias_count; i++)
 	{
-		printf("%s='%s'\n", aliases[i]->name, aliases[i]->value);
+		printf("%s='%s'\n", Alias[i].name, aliases[i].value);
 	}
 }
 /**
@@ -42,57 +61,40 @@ void print_aliases(char *names[])
 
 	for (i = 0; names[i] != NULL; i++)
 	{
-		int index = find_alias(names[i]);
-
-		if (index != -1)
+		if (_strcmp(names, aliases[i].name) == 0)
 		{
-			printf("%s='%s'\n", aliases[index]->name, aliases[index]->value);
+			printf("%s='%s'\n", aliases[i].name, aliases[i].value);
+			return;
 		}
 	}
+	fprintf(stderr, "Alias not found: %s\n", name);
 }
 /**
  * define_aliases - entry
- * @aliases: args
+ * @name: args
+ * @value: args
 */
-void define_aliases(char *aliases[])
+void define_aliases(const char *name, const char *value)
 {
 	int i;
 
-	for (i = 0; aliases[i] != NULL; i++)
+	for (i = 0; i < alias_count; i++)
 	{
-		char *name = aliases[i];
-		char *value = _strchr(name, '=');
-		int index;
-
-		if (value != NULL)
+		if (_strcmp(name, aliases[i].name) == 0)
 		{
-			*value = '\0';
-			value++;
-			index = find_alias(name);
-
-			if (index != -1)
-			{
-				free(aliases[index]->value);
-				aliases[index]->value = _strdup(value);
-			}
-			else
-			{
-				if (alias_count < MAX_ALIASES)
-				{
-					aliases[alias_count] = malloc(sizeof(struct Alias));
-					_strncpy(aliases[alias_count]->name, name, MAX_ALIAS_NAME_LENGTH -1);
-					_strncpy(aliases[alias_count]->value, value, MAX_ALIAS_VALUE_LENGTH -1);
-					alias_count++;
-				}
-				else
-				{
-					fprintf(stderr, "Alias limit reached. Cannot define more aliases.\n");
-				}
-			}
+			free(aliases[i].value);
+			aliases[i].value = _strdup(value);
+			return;
 		}
-		else
-		{
-			fprintf(stderr, "Invalid alias syntax: %s\n", name);
-		}
+	}
+	if (alias_count < MAX_ALIASES)
+	{
+		aliases[alias_count].name = _strdup(name);
+		aliases[alias_count].value = _strdup(value);
+		alias_count++;
+	}
+	else
+	{
+		fprintf(stderr, "Maximum alias limit reached (%d)\n", MAX_ALIASES);
 	}
 }

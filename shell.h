@@ -18,8 +18,8 @@
 
 /* Structure to store aliases */
 struct Alias {
-	char name[MAX_ALIAS_NAME_LENGTH];
-	char value[MAX_ALIAS_VALUE_LENGTH];
+	char *name[MAX_ALIAS_NAME_LENGTH];
+	char *value[MAX_ALIAS_VALUE_LENGTH];
 };
 
 /* Function prototypes for built-in commands */
@@ -57,10 +57,10 @@ int custom_tokenize(const char *str, char *tokens[], int max_tokens, char delimi
 void replace_variables(char *buffer);
 char *strdup_replace(const char *original, const char *pattern, const char *replacement);
 int execute_command(char *command);
-int find_alias(const char *name);
-void list_aliases(void);
-void define_aliases(char *aliases[]);
+void define_aliases(const char *name, const char *value);
 void print_aliases(char *names[]);
+void list_aliases(void);
+int find_alias(int argc, char*argv[]);
 
 /* Declare the global environment variable */
 extern char **environ;

@@ -5,7 +5,7 @@ It provides basic command execution and built-in functionality.
 
 ## Features
 
-- Execute external commands.
+- Executes external commands.
 - Implement built-in shell commands like `cd`, `env`, `exit`, and more.
 - Handle environment variables.
 - Define and manage aliases.
